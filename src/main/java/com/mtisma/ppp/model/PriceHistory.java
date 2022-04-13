@@ -1,4 +1,4 @@
-package com.example.ppp.model;
+package com.mtisma.ppp.model;
 
 import lombok.Getter;
 import lombok.Setter;
