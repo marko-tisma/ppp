@@ -1,6 +1,5 @@
 package com.mtisma.ppp.repository;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 @Repository
-@Slf4j
 public class ImageFileRepository {
 
     private static final String BASE_DIR = Paths.get("./").toAbsolutePath() + "images/";
@@ -26,13 +24,12 @@ public class ImageFileRepository {
             Files.write(path, data);
             return Optional.of(path.toString());
         } catch (IOException e) {
-            log.warn("Failed to save file: " + fileName, e);
             return Optional.empty();
         }
     }
 
-    public Optional<FileSystemResource> getFile(String fileName) {
-        Path path = Path.of(BASE_DIR + fileName);
+    public Optional<FileSystemResource> getFile(String location) {
+        Path path = Path.of(location);
         if (!Files.exists(path)) {
             return Optional.empty();
         }

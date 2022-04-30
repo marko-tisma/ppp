@@ -34,7 +34,7 @@ public class ImageFileRepositoryTests {
         String name = "test_image";
         Optional<String> location = fileRepository.save(name, data);
         assertTrue(location.isPresent());
-        Optional<FileSystemResource> file = fileRepository.getFile(name);
+        Optional<FileSystemResource> file = fileRepository.getFile(location.get());
         assertTrue(file.isPresent());
         FileSystemResource res = file.get();
         assertArrayEquals(data, res.getInputStream().readAllBytes());

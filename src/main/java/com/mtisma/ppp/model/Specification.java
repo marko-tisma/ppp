@@ -1,10 +1,7 @@
 package com.mtisma.ppp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +22,7 @@ public class Specification {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     private Product product;
 
     @NotNull

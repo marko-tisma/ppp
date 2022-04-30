@@ -1,5 +1,6 @@
 package com.mtisma.ppp.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,8 +31,10 @@ public class Product {
     private String description;
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonManagedReference
     private List<Specification> specifications;
 
     @OneToMany(mappedBy = "product")
+    @JsonManagedReference
     private List<Image> images;
 }
