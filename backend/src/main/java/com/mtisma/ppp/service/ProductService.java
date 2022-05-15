@@ -53,7 +53,16 @@ public class ProductService {
     ) {
         PageRequest pageable = PageRequest.of(page.orElse(0), size.orElse(Integer.MAX_VALUE));
         if (sortBy.isPresent()) {
-            pageable = pageable.withSort(Sort.by(sortBy.get()));
+            String property = sortBy.get();
+            Sort.Direction direction = Sort.Direction.ASC;
+            if (property.charAt(0) == '+') {
+                property = property.substring(1);
+            } else if (property.charAt(0) == '-') {
+                direction = Sort.Direction.DESC;
+                property = property.substring(1);
+            }
+
+            pageable = pageable.withSort(Sort.by(direction, property));
         }
         return productRepository.findByCategoryIdAndNameContaining(id, nameQuery.orElse(""), pageable);
     }
