@@ -1,0 +1,68 @@
+.container {
+  height: 100%;
+}
+
+.main {
+  padding: 4rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.categoriesContainer {
+  width: 100vh;
+}
+
+.categoryContainer {
+  width: 50vw;
+}
+
+.productsContainer {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.productsTable {
+  flex: 1;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.25rem;
+  margin: 0.5rem;
+  font-size: large;
+}
+
+.table {
+  width: 50vw;
+  text-align: left;
+  border-spacing: 15px;
+  table-layout: fixed;
+}
+
+.imageTh {
+  z-index: -1;
+  width: 64px;
+}
+
+.btn {
+  height: 4rem;
+  font-size: 2rem;
+  border: 0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: white;
+  margin-top: 3px;
+  background-color: rgb(75, 70, 70);
+  width: 100%;
+}
+
+.btn:hover {
+  background-color: #0070f3;
+}
