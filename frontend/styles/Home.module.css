@@ -25,7 +25,7 @@
   align-items: center;
 }
 
-.productsTable {
+.productTableContainer {
   flex: 1;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -39,26 +39,37 @@
   font-size: large;
 }
 
-.table {
-  width: 50vw;
+.productTable {
+  width: 100%;
   text-align: left;
-  border-spacing: 15px;
-  table-layout: fixed;
+  border-spacing: 5px;
 }
 
 .imageTh {
-  z-index: -1;
-  width: 64px;
+  z-index: 1;
+  width: 80px;
+}
+
+.nameTd {
+  font-weight: 700;
+}
+
+.priceTd {
+  font-weight: 700;
+}
+
+.priceTd:hover {
+  color:#0070f3;
 }
 
 .btn {
   height: 4rem;
   font-size: 2rem;
   border: 0;
-  border-radius: 0.5rem;
+  border-radius: 0.2rem;
   cursor: pointer;
   color: white;
-  margin-top: 3px;
+  margin-top: 2px;
   background-color: rgb(75, 70, 70);
   width: 100%;
 }

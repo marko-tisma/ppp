@@ -123,8 +123,8 @@ const Products: any = ({category} : {category: Category}) => {
     <div className={styles.productsContainer}>
       <input type="text" onChange={(e) => onSearch(e.target.value)} className={styles.searchInput}></input>
       {products.length > 0 ? (
-        <div ref={tableRef} className={styles.productsTable} onScroll={onScroll} style={{backgroundColor: 'white'}}>
-          <table>
+        <div ref={tableRef} className={styles.productTableContainer} onScroll={onScroll} style={{backgroundColor: 'white'}}>
+          <table className={styles.productTable}>
             <thead>
               <tr>
                 <th className={styles.imageTh}></th>
@@ -135,12 +135,12 @@ const Products: any = ({category} : {category: Category}) => {
             <tbody>
               {products && products.map(p =>
                 <tr key={p.id}>
-                  <th className={styles.imageTh}>
+                  <td>
                     {p.images && p.images[0] ? <Image src={`${apiUrl}/images/download/${p.images[0].id}`} width="64" height="64"></Image>
                     : <Image src={noImage} width="64" height="64"></Image>}
-                  </th>
-                  <th>{p.name}</th>
-                  <th>{p.currentPrice}</th>
+                  </td>
+                  <td className={styles.nameTd}>{p.name}</td>
+                  <td className={styles.priceTd}>{p.currentPrice}</td>
                 </tr>
               )}
             </tbody>
@@ -158,10 +158,6 @@ const Home: any = ({categories}: {categories: Category[]}) => {
 
   const selectCategory = (event: React.MouseEvent<HTMLButtonElement>, category: Category) => {
     setActiveCategory(activeCategory == category ? null : category);
-    if (event.target instanceof Element) {
-      const t: Element = event.target;
-      setTimeout(() => t.scrollIntoView(true), 50);
-    }
   }
 
   return (
@@ -170,7 +166,6 @@ const Home: any = ({categories}: {categories: Category[]}) => {
         <title>PPP</title>
       </Head>
       <main className={styles.main}>
-        <div>
           {categories.map(c => 
             <div key={c.id} className={styles.categoryContainer}>
               <button onClick={(e) => selectCategory(e, c)} className={styles.btn}>
@@ -179,7 +174,6 @@ const Home: any = ({categories}: {categories: Category[]}) => {
               {activeCategory == c && <Products category={c}></Products>}
             </div>
           )}
-        </div>
       </main>
     </div>
   )
