@@ -35,8 +35,19 @@ async function getCategories(): Promise<Category[]> {
   return await res.json(); 
 }
 
+async function refreshProducts(): Promise<boolean> {
+  const res = await fetch(apiUrl + '/products/refresh');
+  return res.ok;
+}
+
 export async function getStaticProps(context: any) {
-  const categories = await getCategories();
+  let categories = await getCategories();
+  if (categories.length === 0) {
+    const refreshed = await refreshProducts();
+    if (refreshed) {
+      categories = await getCategories();
+    }
+  }
   return {
     props: {
       categories
