@@ -1,12 +1,16 @@
 package com.mtisma.ppp.controller;
 
+import com.mtisma.ppp.model.PriceHistory;
 import com.mtisma.ppp.model.Product;
+import com.mtisma.ppp.model.Specification;
 import com.mtisma.ppp.service.ProductService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +34,19 @@ public class ProductController {
     public Product getById(@PathVariable("id") long id) {
         return productService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/{id}/history")
+    public List<PriceHistory> getHistoryById(
+            @PathVariable("id") long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return productService.getProductHistory(id, Optional.ofNullable(from), Optional.ofNullable(to));
+    }
+
+    @GetMapping("/{id}/specifications")
+    public List<Specification> getSpecificationsById(@PathVariable("id") long id) {
+        return productService.getSpecificationsById(id);
     }
 
     @GetMapping("/category/{id}")

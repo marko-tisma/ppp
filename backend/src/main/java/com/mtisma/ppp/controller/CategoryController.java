@@ -37,9 +37,6 @@ public class CategoryController {
         @RequestParam(required = false) String sortBy,
         @RequestParam(required = false) String nameQuery
     ) {
-        categoryService.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
         return productService.findByCategoryId(
                 id,
                 Optional.ofNullable(page),

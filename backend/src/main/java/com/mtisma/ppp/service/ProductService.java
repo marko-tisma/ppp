@@ -1,18 +1,13 @@
 package com.mtisma.ppp.service;
 
-import com.mtisma.ppp.model.Category;
-import com.mtisma.ppp.model.Image;
-import com.mtisma.ppp.model.Product;
-import com.mtisma.ppp.repository.CategoryRepository;
-import com.mtisma.ppp.repository.ImageFileRepository;
-import com.mtisma.ppp.repository.ImageRepository;
-import com.mtisma.ppp.repository.ProductRepository;
+import com.mtisma.ppp.model.*;
+import com.mtisma.ppp.repository.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,25 +18,33 @@ public class ProductService {
     private final ProductScraper scraper;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final PriceHistoryRepository priceHistoryRepository;
+    private final SpecificationRepository specificationRepository;
     private final ImageRepository imageRepository;
     private final ImageFileRepository fileRepository;
 
     public ProductService(ProductScraper scraper,
                           ProductRepository productRepository,
                           CategoryRepository categoryRepository,
+                          PriceHistoryRepository priceHistoryRepository,
+                          SpecificationRepository specificationRepository,
                           ImageRepository imageRepository,
                           ImageFileRepository fileRepository) {
         this.scraper = scraper;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.priceHistoryRepository = priceHistoryRepository;
+        this.specificationRepository = specificationRepository;
         this.imageRepository = imageRepository;
         this.fileRepository = fileRepository;
     }
 
     public List<Product> findAll() {
-        List<Product> products = new ArrayList<>();
-        productRepository.findAll().forEach(products::add);
-        return products;
+        return productRepository.findAll();
+    }
+
+    public Optional<Product> findById(long id) {
+        return productRepository.findById(id);
     }
 
     public List<Product> findByCategoryId(
@@ -67,10 +70,6 @@ public class ProductService {
         return productRepository.findByCategoryIdAndNameContaining(id, nameQuery.orElse(""), pageable);
     }
 
-    public Optional<Product> findById(long id) {
-        return productRepository.findById(id);
-    }
-
     public boolean updateProducts() {
         log.info("Products update started");
         Collection<Product> products = scraper.scrape();
@@ -82,6 +81,7 @@ public class ProductService {
         Map<Category, List<Product>> categories = products.stream()
                 .collect(Collectors.groupingBy(Product::getCategory));
 
+        var now = LocalDate.now();
         categories.entrySet().parallelStream()
                 .forEach(c -> {
                     Category category = categoryRepository.findOneByName(c.getKey().getName())
@@ -89,14 +89,24 @@ public class ProductService {
                     for (Product product : c.getValue()) {
                         product.setCategory(category);
                         productRepository.save(product);
-
+                        priceHistoryRepository.save(PriceHistory.builder()
+                                .product(product)
+                                .amount(product.getCurrentPrice())
+                                .createdAt(now)
+                                .build()
+                        );
+                        if (product.getSpecifications() != null) {
+                            product.getSpecifications().forEach(spec -> {
+                                if (specificationRepository.findByProductIdAndName(product.getId(), spec.getName()).isEmpty()) {
+                                    specificationRepository.save(spec);
+                                }
+                            });
+                        }
                         if (product.getImages() == null || product.getImages().size() == 0) {
                             continue;
                         }
                         Image image = product.getImages().get(0);
-                        Optional<FileSystemResource> imageResource = fileRepository.getFile(image.getName());
-                        if (imageResource.isPresent()) {
-                            product.getImages().remove(0);
+                        if (imageRepository.findByName(image.getName()).isPresent()) {
                             continue;
                         }
                         Optional<String> location = fileRepository.save(image.getName(), image.getData());
@@ -116,4 +126,13 @@ public class ProductService {
         return true;
     }
 
+    public List<PriceHistory> getProductHistory(Long productId, Optional<LocalDate> from, Optional<LocalDate> to) {
+        return priceHistoryRepository.findByProductIdAndCreatedAtBetween(
+                productId, from.orElse(LocalDate.MIN), to.orElse(LocalDate.MAX)
+        );
+    }
+
+    public List<Specification> getSpecificationsById(long id) {
+        return specificationRepository.findByProductId(id);
+    }
 }

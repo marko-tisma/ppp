@@ -1,18 +1,19 @@
 package com.mtisma.ppp.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Table(indexes = @Index(columnList = "createdAt"))
 public class PriceHistory {
 
     @Id
@@ -20,10 +21,11 @@ public class PriceHistory {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Product product;
 
     private BigDecimal amount;
 
-    private LocalDateTime at;
+    private LocalDate createdAt;
 
 }

@@ -1,5 +1,6 @@
 package com.mtisma.ppp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -30,8 +31,8 @@ public class Product {
     @Lob
     private String description;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JsonManagedReference
+    @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<Specification> specifications;
 
     @OneToMany(mappedBy = "product")

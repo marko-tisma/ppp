@@ -18,9 +18,7 @@ public class CategoryService {
     }
 
     public List<Category> findAll() {
-        List<Category> categories = new ArrayList<>();
-        this.categoryRepository.findAll().forEach(categories::add);
-        return categories;
+        return categoryRepository.findAll();
     }
 
     public Optional<Category> findById(long id) {

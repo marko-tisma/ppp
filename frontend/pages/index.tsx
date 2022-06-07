@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import noImage from "../public/no_image.png";
 import styles from '../styles/Home.module.css';
 
@@ -18,12 +19,17 @@ interface Product {
   images: Image[],
   currentPrice: number,
   description: string,
-  specs: Spec[]
+  specifications: Specification[]
 }
 
-interface Spec {
+interface Specification {
   name: string,
   value: string
+}
+
+interface PriceHistory {
+  amount: number,
+  createdAt: Date
 }
 
 interface Image {
@@ -63,7 +69,13 @@ const debounce = (f: Function, timeout = 300) => {
   }
 }
 
-const Products: any = ({category} : {category: Category}) => {
+const ProductImage: any = ({product, width, height}: {product: Product, width: number, height: number}) => {
+  return product && product.images && product.images[0]
+    ? <Image src={`${apiUrl}/images/download/${product.images[0].id}`} width={width} height={height}></Image>
+    : <Image src={noImage} width={width} height={height}></Image>
+}
+
+const Products: any = ({category, setActiveProduct} : {category: Category, setActiveProduct: Function}) => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState<number>(0);
@@ -119,28 +131,33 @@ const Products: any = ({category} : {category: Category}) => {
     }
   });
 
+  const popup = useRef<HTMLDivElement>(null);
+
   return (
     <div className={styles.productsContainer}>
       <input type="text" onChange={(e) => onSearch(e.target.value)} className={styles.searchInput}></input>
       {products.length > 0 ? (
-        <div ref={tableRef} className={styles.productTableContainer} onScroll={onScroll} style={{backgroundColor: 'white'}}>
+        <div ref={tableRef} className={styles.productTableContainer} onScroll={onScroll}>
           <table className={styles.productTable}>
             <thead>
               <tr>
                 <th className={styles.imageTh}></th>
-                <th onClick={() => onSort('name')}><h2>Name</h2></th>
-                <th onClick={() => onSort('currentPrice')}><h2>Price</h2></th>
+                <th onClick={() => onSort('name')} className={styles.nameTh}>
+                  <h1>Name{sortBy == '+name' ? <span>⬆️</span> : sortBy == '-name' ? <span>⬇️</span>: ""} </h1>
+                </th>
+                <th onClick={() => onSort('currentPrice')} className={styles.priceTh}>
+                  <h2>Price{sortBy == '+currentPrice' ? <span>⬆️</span> : sortBy == '-currentPrice' ? <span>⬇️</span>: ""}</h2>
+                </th>
               </tr>
             </thead>
             <tbody>
               {products && products.map(p =>
-                <tr key={p.id}>
+                  <tr key={p.id} onClick={() => setActiveProduct(p)}>
                   <td>
-                    {p.images && p.images[0] ? <Image src={`${apiUrl}/images/download/${p.images[0].id}`} width="64" height="64"></Image>
-                    : <Image src={noImage} width="64" height="64"></Image>}
+                    <ProductImage product={p} width={64} height={64}></ProductImage>
                   </td>
                   <td className={styles.nameTd}>{p.name}</td>
-                  <td className={styles.priceTd}>{p.currentPrice}</td>
+                  <td className={styles.priceTd}>{Number(p.currentPrice).toLocaleString()} RSD</td>
                 </tr>
               )}
             </tbody>
@@ -151,13 +168,94 @@ const Products: any = ({category} : {category: Category}) => {
   );
 }
 
+const PriceHistory: any = ({history}: {history: PriceHistory[]}) => {
+  return history && history.length > 0 && (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart 
+        data={history}
+        margin={{
+          top: 30,
+          right: 10,
+          left: 0,
+          bottom: 30
+        }}
+      >
+        <XAxis dataKey="createdAt"/>
+        <YAxis dataKey="amount"/>
+        <Line type="monotone" dataKey="amount"></Line>
+      </LineChart>
+    </ResponsiveContainer>
+    )
+}
+
+const Details: any = ({product}: {product: Product}) => {
+
+  const [specs, setSpecs] = useState<Specification[]>([]);
+  const [history, setHistory] = useState<PriceHistory[]>([]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function getProductSpecs() {
+      const res = await fetch(`${apiUrl}/products/${product.id}/specifications`);
+      setSpecs(await res.json());
+    }
+
+    async function getProductHistory() {
+      let now = new Date();
+      let to = now.toISOString();
+      to = to.substring(0, to.indexOf("T"));
+
+      now.setMonth(now.getMonth() - 1);
+      let from = now.toISOString();
+      from = from.substring(0, from.indexOf("T"));
+
+      const res = await fetch(`${apiUrl}/products/${product.id}/history?from=${from}&to=${to}`);
+      setHistory(await res.json());
+    }
+
+    if (product) {
+      getProductSpecs();
+      getProductHistory();
+    }
+    else {
+      setSpecs([]);
+      setHistory([]);
+    }
+  }, [product])
+
+  return product && (
+    <div className={styles.detailsTableContainer} ref={containerRef}>
+      <ProductImage product={product} width={160} height={160}></ProductImage>
+      <h3>{product.name}</h3>
+      <table className={styles.detailsTable}>
+        <tbody>
+          {specs.map(s => 
+          <tr key={s.name} className={styles.detailsTableTr}>
+            <td className={styles.detailsTableTd}>{s.name}</td>
+            <td className={styles.detailsTableTd}>{s.value}</td>
+          </tr>
+        )}
+        </tbody>
+      </table>
+      <div className={styles.historyContainer}>
+        <PriceHistory history={history}></PriceHistory>
+      </div>
+    </div>
+  )
+}
 
 const Home: any = ({categories}: {categories: Category[]}) => {
 
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const selectCategory = (event: React.MouseEvent<HTMLButtonElement>, category: Category) => {
-    setActiveCategory(activeCategory == category ? null : category);
+  const selectCategory = (category: Category) => {
+    setSelectedCategory(selectedCategory == category ? null : category);
+  }
+
+  const selectProduct = (product: Product) => {
+    setSelectedProduct(selectedProduct == product ? null : product);
   }
 
   return (
@@ -165,16 +263,20 @@ const Home: any = ({categories}: {categories: Category[]}) => {
       <Head>
         <title>PPP</title>
       </Head>
+      <aside className={styles.leftAside}></aside>
       <main className={styles.main}>
           {categories.map(c => 
-            <div key={c.id} className={styles.categoryContainer}>
-              <button onClick={(e) => selectCategory(e, c)} className={styles.btn}>
+            <div key={c.id}>
+              <button onClick={() => selectCategory(c)} className={styles.btn}>
                 {c.name}
               </button>
-              {activeCategory == c && <Products category={c}></Products>}
+              {selectedCategory == c && <Products category={c} setActiveProduct={selectProduct}></Products>}
             </div>
           )}
       </main>
+      <aside className={styles.rightAside}>
+        <Details product={selectedProduct}></Details>
+      </aside>
     </div>
   )
 }

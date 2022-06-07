@@ -1,6 +1,7 @@
 package com.mtisma.ppp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -22,7 +23,7 @@ public class Specification {
     private Long id;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonIgnore
     private Product product;
 
     @NotNull

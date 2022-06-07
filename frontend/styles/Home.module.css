@@ -1,35 +1,59 @@
 .container {
   height: 100%;
+  display: flex;
 }
 
 .main {
+  width: 50vw;
   padding: 4rem 0;
+}
+
+.leftAside {
+  flex: 1;
+}
+
+.rightAside {
+  flex: 1;
+}
+
+.detailsTableContainer {
+  margin: 4.5rem 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 20vw;
 }
 
-.categoriesContainer {
-  width: 100vh;
+.detailsTable {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse; 
 }
 
-.categoryContainer {
-  width: 50vw;
+.detailsTableTd {
+  border: 2px solid gray;
+}
+
+.historyContainer {
+  width: 100%;
+  height: 300px;
+  align-self: left;
 }
 
 .productsContainer {
   max-height: 80vh;
-  display: flex;
+  width: 100%;
+  display: flex; 
   flex-direction: column;
   align-items: center;
 }
 
 .productTableContainer {
-  flex: 1;
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: hidden; 
   width: 100%;
+  background-color: white; 
 }
 
 .searchInput {
@@ -48,6 +72,10 @@
 .imageTh {
   z-index: 1;
   width: 80px;
+}
+
+.nameTh:hover, .priceTh:hover {
+  color:#0070f3;
 }
 
 .nameTd {

@@ -1,6 +1,8 @@
 html,
 body {
   /* background-color: #0305164f;  */
+  /* overflow-y: scroll; */
+  scrollbar-gutter: stable both-edges;
   height: 100%;
   padding: 0;
   margin: 0;
