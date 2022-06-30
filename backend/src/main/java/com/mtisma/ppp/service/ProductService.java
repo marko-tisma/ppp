@@ -5,7 +5,9 @@ import com.mtisma.ppp.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -70,6 +72,11 @@ public class ProductService {
         return productRepository.findByCategoryIdAndNameContaining(id, nameQuery.orElse(""), pageable);
     }
 
+    @Scheduled(cron = "0 0 15 * * *")
+    public void dailyRefresh() {
+        updateProducts();
+    }
+
     public boolean updateProducts() {
         log.info("Products update started");
         Collection<Product> products = scraper.scrape();
@@ -88,42 +95,46 @@ public class ProductService {
                             .orElseGet(() -> categoryRepository.save(c.getKey()));
                     for (Product product : c.getValue()) {
                         product.setCategory(category);
-                        productRepository.save(product);
-                        priceHistoryRepository.save(PriceHistory.builder()
-                                .product(product)
-                                .amount(product.getCurrentPrice())
-                                .createdAt(now)
-                                .build()
-                        );
-                        if (product.getSpecifications() != null) {
-                            product.getSpecifications().forEach(spec -> {
-                                if (specificationRepository.findByProductIdAndName(product.getId(), spec.getName()).isEmpty()) {
-                                    specificationRepository.save(spec);
-                                }
-                            });
-                        }
-                        if (product.getImages() == null || product.getImages().size() == 0) {
-                            continue;
-                        }
-                        Image image = product.getImages().get(0);
-                        if (imageRepository.findByName(image.getName()).isPresent()) {
-                            continue;
-                        }
-                        Optional<String> location = fileRepository.save(image.getName(), image.getData());
-                        if (location.isPresent()) {
-                            image.setProduct(product);
-                            image.setLocation(location.get());
-                            imageRepository.save(image);
-                            log.info("Saved image: %s of product: %s at location: %s"
-                                    .formatted(image.getName(), product.getName(), location));
-                        } else {
-                            product.getImages().remove(0);
-                            log.error("Failed to save image: %s of product: %s at location: %s"
-                                    .formatted(image.getName(), product.getName(), location));
-                        }
+                        saveProduct(product, now);
                     }
         });
         return true;
+    }
+
+    @Transactional
+    public void saveProduct(Product product, LocalDate now) {
+        productRepository.save(product);
+        priceHistoryRepository.save(PriceHistory.builder()
+                .product(product)
+                .amount(product.getCurrentPrice())
+                .createdAt(now)
+                .build()
+        );
+        if (product.getSpecifications() != null) {
+            product.getSpecifications().forEach(s -> {
+                Specification spec = specificationRepository.findByProductIdAndName(product.getId(), s.getName()).orElse(s);
+                spec.setValue(s.getValue());
+                specificationRepository.save(spec);
+            });
+        }
+        if (product.getImages() == null || product.getImages().size() == 0) {
+            return;
+        }
+        Image thumbnail = product.getImages().get(0);
+        if (imageRepository.findByName(thumbnail.getName()).isPresent()) {
+            return;
+        }
+        Optional<String> location = fileRepository.save(thumbnail.getName(), thumbnail.getData());
+        if (location.isPresent()) {
+            thumbnail.setProduct(product);
+            thumbnail.setLocation(location.get());
+            imageRepository.save(thumbnail);
+            log.info("Saved thumbnail: %s of product: %s at location: %s"
+                    .formatted(thumbnail.getName(), product.getName(), location));
+        } else {
+            log.error("Failed to save thumbnail: %s of product: %s at location: %s"
+                    .formatted(thumbnail.getName(), product.getName(), location));
+        }
     }
 
     public List<PriceHistory> getProductHistory(Long productId, Optional<LocalDate> from, Optional<LocalDate> to) {
