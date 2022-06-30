@@ -1,0 +1,72 @@
+.productsContainer {
+  max-height: 80vh;
+  width: 100%;
+  display: flex; 
+  flex-direction: column;
+  align-items: center;
+}
+
+.productTableContainer {
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.searchInput {
+  width: calc(100% - 0.5rem);
+  margin: 0.5rem;
+  font-size: x-large;
+  border: 2px solid;
+  min-height: 40px;
+}
+
+.productTable {
+  width: 100%;
+  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0px;
+}
+
+.productTable th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+  font-size: x-large;
+  padding: 20px 20px;
+  border-bottom: 2px solid black;
+}
+
+.productTable tr:hover {
+  background: lightcyan;
+}
+
+.imageTh {
+  min-width: 70px;
+}
+
+.nameTh:hover, .priceTh:hover, .priceTd:hover {
+  color:#0070f3;
+}
+
+.productTable td {
+  border-bottom: 1px solid black;
+  z-index: -1;
+}
+
+.nameTd, .priceTd {
+  font-weight: 600;
+  font-size: medium;
+  padding: 10px 10px;
+}
+
+@media only screen and (max-width: 1600px) {
+
+  .nameTd, .priceTd {
+    font-size: small;
+  }
+
+  .imageTh {
+    min-width: 40px;
+  }
+}

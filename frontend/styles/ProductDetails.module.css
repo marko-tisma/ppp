@@ -1,0 +1,25 @@
+.detailsTableContainer {
+  margin: 4.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 20vw;
+  position: sticky;
+  top: 3rem;
+}
+
+.detailsTable {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse; 
+}
+
+.detailsTableTd {
+  border: 2px solid gray;
+}
+
+.historyContainer {
+  width: 100%; 
+  height: 300px; 
+}

@@ -1,32 +1,11 @@
 html,
 body {
-  /* background-color: #0305164f;  */
-  /* overflow-y: scroll; */
   scrollbar-gutter: stable both-edges;
   height: 100%;
-  padding: 0;
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-/* body {
-  display: flex;
-  flex-direction: column;
-} */
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 * {
   box-sizing: border-box;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background: white;
-  padding-bottom: 5px;
 }
