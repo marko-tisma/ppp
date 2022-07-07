@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { FC, useEffect, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import xImage from "../../public/x_button.png";
 import { PriceHistory, Product, Specification } from "../types/product";
-import { getProductSpecs, getProductHistory } from "./service/ProductService";
 import ProductImage from "./ProductImage";
+import { getProductHistory, getProductSpecs } from "./service/ProductService";
 
 import styles from "../../styles/ProductDetails.module.css";
 
-const ProductDetails: any = ({product}: {product: Product}) => {
+const ProductDetails = ({product, setActiveProduct}: {product: Product, setActiveProduct: Function}) => {
 
   const [specs, setSpecs] = useState<Specification[]>([]);
   const [history, setHistory] = useState<PriceHistory[]>([]);
-
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function reloadDetails() {
@@ -33,7 +33,10 @@ const ProductDetails: any = ({product}: {product: Product}) => {
   }, [product])
 
   return product && (
-    <div className={styles.detailsTableContainer} ref={containerRef}>
+    <div className={styles.detailsContainer}>
+        <div className={styles.xImage} onClick={() => setActiveProduct(null)}>
+          <Image src={xImage} width={32} height={32}></Image>
+        </div>
       <ProductImage product={product} width={160} height={160}></ProductImage>
       <h3>{product.name}</h3>
       <table className={styles.detailsTable}>
@@ -46,32 +49,30 @@ const ProductDetails: any = ({product}: {product: Product}) => {
         )}
         </tbody>
       </table>
-      <div className={styles.historyContainer}>
+      {history && history.length > 0 && <div className={styles.historyContainer}>
         <PriceHistoryChart history={history}></PriceHistoryChart>
-      </div>
+      </div>}
     </div>
   )
 }
 
-const PriceHistoryChart: any = ({history}: {history: PriceHistory[]}) => {
-  return history && history.length > 0 && (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart 
-        data={history}
-        margin={{
-          top: 30,
-          right: 10,
-          left: 0,
-          bottom: 30
-        }}
-      >
-        <XAxis dataKey="createdAt"/>
-        <YAxis dataKey="amount"/>
-        <Tooltip formatter={(value:any, name:any, props:any) => [Number(value).toLocaleString() + " RSD", "price"]}/>
-        <Line type="monotone" dataKey="amount" activeDot={{ r: 8 }}></Line>
-      </LineChart>
-    </ResponsiveContainer>
-    )
-}
+const PriceHistoryChart = ({history}: {history: PriceHistory[]}) => (
+  <ResponsiveContainer width="100%" height="100%">
+    <LineChart 
+      data={history}
+      margin={{
+        top: 30,
+        right: 10,
+        left: 0,
+        bottom: 30
+      }}
+    >
+      <XAxis dataKey="createdAt"/>
+      <YAxis dataKey="amount"/>
+      <Tooltip formatter={(value:any, name:any, props:any) => [Number(value).toLocaleString() + " RSD", "price"]}/>
+      <Line type="monotone" dataKey="amount" activeDot={{ r: 8 }}></Line>
+    </LineChart>
+  </ResponsiveContainer>
+)
 
 export default ProductDetails;

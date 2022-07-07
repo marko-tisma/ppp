@@ -51,7 +51,7 @@ const Home: any = ({categories}: {categories: Category[]}) => {
           )}
       </main>
       {selectedProduct && <aside>
-          <ProductDetails product={selectedProduct}></ProductDetails>
+          <ProductDetails product={selectedProduct} setActiveProduct={selectProduct}></ProductDetails>
         </aside>
       }
     </div>
