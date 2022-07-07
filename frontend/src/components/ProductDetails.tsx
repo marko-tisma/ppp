@@ -20,7 +20,9 @@ const ProductDetails: any = ({product}: {product: Product}) => {
         let to = new Date();
         let from = new Date();
         from.setMonth(from.getMonth() - 1);
-        setHistory(await getProductHistory(product, from, to));
+        let history = await getProductHistory(product, from, to)
+        history = history.filter((h, index) => history.findIndex(x => x.createdAt === h.createdAt) == index);
+        setHistory(history);
       }
       else {
         setSpecs([]);
