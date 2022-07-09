@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface SpecificationRepository extends CrudRepository<Specification, Long> {
     List<Specification> findByProductId(Long id);
+
     Optional<Specification> findByProductIdAndName(Long id, String name);
 }

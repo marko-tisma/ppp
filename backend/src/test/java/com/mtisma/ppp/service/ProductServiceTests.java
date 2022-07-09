@@ -50,20 +50,20 @@ public class ProductServiceTests {
     public void testSameProductCategoryUpdate() {
         Category mockCategory = new Category("Procesori");
         Product mockProduct1 = Product.builder()
-                .id(1L)
-                .name("Intel Core i2-9100F 3.6GHz BOX LGA1151 procesor")
-                .category(mockCategory)
-                .build();
+            .id(1L)
+            .name("Intel Core i2-9100F 3.6GHz BOX LGA1151 procesor")
+            .category(mockCategory)
+            .build();
         Product mockProduct2 = Product.builder()
-                .id(2L)
-                .name("mock2")
-                .category(mockCategory)
-                .build();
+            .id(2L)
+            .name("mock2")
+            .category(mockCategory)
+            .build();
         Product mockProduct3 = Product.builder()
-                .id(3L)
-                .name("mock3")
-                .category(new Category("Procesori"))
-                .build();
+            .id(3L)
+            .name("mock3")
+            .category(new Category("Procesori"))
+            .build();
 
         Set<Product> productsMock = Set.of(mockProduct1, mockProduct2, mockProduct3);
         given(productScraperMock.scrape()).willReturn(productsMock);
@@ -83,15 +83,15 @@ public class ProductServiceTests {
     public void testSameProductIdUpdate() {
         Category mockCategory = new Category("Procesori");
         Product mockProduct1 = Product.builder()
-                .id(1L)
-                .name("Intel Core i2-9100F 3.6GHz BOX LGA1151 procesor")
-                .category(mockCategory)
-                .build();
+            .id(1L)
+            .name("Intel Core i2-9100F 3.6GHz BOX LGA1151 procesor")
+            .category(mockCategory)
+            .build();
         Product mockProduct2 = Product.builder()
-                .id(1L)
-                .name("mock")
-                .category(mockCategory)
-                .build();
+            .id(1L)
+            .name("mock")
+            .category(mockCategory)
+            .build();
 
         List<Product> productsMock = List.of(mockProduct1, mockProduct2);
         given(productScraperMock.scrape()).willReturn(productsMock);

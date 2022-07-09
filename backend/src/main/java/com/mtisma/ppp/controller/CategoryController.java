@@ -4,16 +4,13 @@ import com.mtisma.ppp.model.Category;
 import com.mtisma.ppp.model.Product;
 import com.mtisma.ppp.service.CategoryService;
 import com.mtisma.ppp.service.ProductService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -38,11 +35,11 @@ public class CategoryController {
         @RequestParam(required = false) String nameQuery
     ) {
         return productService.findByCategoryId(
-                id,
-                Optional.ofNullable(page),
-                Optional.ofNullable(size),
-                Optional.ofNullable(sortBy),
-                Optional.ofNullable(nameQuery)
+            id,
+            Optional.ofNullable(page),
+            Optional.ofNullable(size),
+            Optional.ofNullable(sortBy),
+            Optional.ofNullable(nameQuery)
         );
     }
 

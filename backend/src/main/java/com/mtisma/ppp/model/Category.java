@@ -28,5 +28,7 @@ public class Category {
     @JsonIgnore
     private List<Product> products = new ArrayList<>();
 
-    public Category(String name) { this.name = name; }
+    public Category(String name) {
+        this.name = name;
+    }
 }

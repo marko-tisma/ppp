@@ -4,7 +4,6 @@ import com.mtisma.ppp.model.Category;
 import com.mtisma.ppp.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

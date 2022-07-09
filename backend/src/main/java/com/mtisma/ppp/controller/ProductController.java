@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class ProductController {
 
     private final ProductService productService;
@@ -33,14 +32,14 @@ public class ProductController {
     @GetMapping("/{id}")
     public Product getById(@PathVariable("id") long id) {
         return productService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/{id}/history")
     public List<PriceHistory> getHistoryById(
-            @PathVariable("id") long id,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        @PathVariable("id") long id,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return productService.getProductHistory(id, Optional.ofNullable(from), Optional.ofNullable(to));
     }
 
@@ -51,11 +50,11 @@ public class ProductController {
 
     @GetMapping("/category/{id}")
     public List<Product> getProductsByCategoryId(
-            @PathVariable("id") long id,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String searchString
+        @PathVariable("id") long id,
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size,
+        @RequestParam(required = false) String sortBy,
+        @RequestParam(required = false) String searchString
     ) {
         return productService.findByCategoryId(
             id,
@@ -68,7 +67,7 @@ public class ProductController {
 
     @GetMapping("/refresh")
     public ResponseEntity<?> refreshProducts() {
-       boolean updated = productService.updateProducts();
-       return updated ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
+        boolean updated = productService.updateProducts();
+        return updated ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
     }
 }

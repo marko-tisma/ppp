@@ -25,7 +25,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
-public class EponudaScraper implements ProductScraper{
+public class EponudaScraper implements ProductScraper {
 
     private static final String BASE_URL = "https://eponuda.com";
 
@@ -33,12 +33,12 @@ public class EponudaScraper implements ProductScraper{
         try {
             Document categoriesPage = fetchPage(BASE_URL + "/racunari/racunarske-komponente/");
             return categoriesPage.select(".b-object__title").parallelStream()
-                    .flatMap(e -> scrapeCategory(
-                            new Category(e.select("span").text()),
-                            e.select("a").attr("abs:href"),
-                            1).stream()
-                    )
-                    .collect(toList());
+                .flatMap(e -> scrapeCategory(
+                    new Category(e.select("span").text()),
+                    e.select("a").attr("abs:href"),
+                    1).stream()
+                )
+                .collect(toList());
         } catch (IOException e) {
             log.warn("Failed fetching categories page", e);
             return new ArrayList<>();
@@ -58,12 +58,12 @@ public class EponudaScraper implements ProductScraper{
             return new ArrayList<>();
         }
         List<Product> products = productPage.select(".prWrap").parallelStream()
-                .map(e -> {
-                    var product = scrapeProduct(e);
-                    product.setCategory(category);
-                    return product;
-                })
-                .collect(Collectors.toList());
+            .map(e -> {
+                var product = scrapeProduct(e);
+                product.setCategory(category);
+                return product;
+            })
+            .collect(Collectors.toList());
 
         Element nextPageLink = productPage.select(".paginationControl > a").last();
         if (nextPageLink != null) {
@@ -73,7 +73,8 @@ public class EponudaScraper implements ProductScraper{
                 if (nextPage > page) {
                     products.addAll(scrapeCategory(category, url, nextPage));
                 }
-            } catch (NumberFormatException ignored) { }
+            } catch (NumberFormatException ignored) {
+            }
         }
         return products;
     }
@@ -88,10 +89,10 @@ public class EponudaScraper implements ProductScraper{
 
         String priceText = productElement.select(".b-paging-product__price").text();
         priceText = priceText.split("-")[0]
-                .split(",")[0]
-                .replace(".", "")
-                .replace("din", "")
-                .trim();
+            .split(",")[0]
+            .replace(".", "")
+            .replace("din", "")
+            .trim();
         BigDecimal price = BigDecimal.valueOf(Long.parseLong(priceText));
         product.setCurrentPrice(price);
 
@@ -108,7 +109,7 @@ public class EponudaScraper implements ProductScraper{
         }
 
         var detailsUrl = BASE_URL + "/" + URLEncoder.encode(
-                title.attr("href").substring(1), StandardCharsets.UTF_8
+            title.attr("href").substring(1), StandardCharsets.UTF_8
         );
         try {
             Document detailsPage = fetchPage(detailsUrl);
@@ -121,20 +122,20 @@ public class EponudaScraper implements ProductScraper{
 
     private byte[] fetchImageData(String url) throws IOException {
         Connection.Response res = Jsoup.connect(url)
-                .ignoreContentType(true)
-                .execute();
+            .ignoreContentType(true)
+            .execute();
         return res.bodyAsBytes();
     }
 
     private Product scrapeProductDetails(Product product, Document detailsPage) {
         List<Specification> specs = detailsPage.select("#SpecCont > ul > li").stream()
-                .map(e -> Specification.builder()
-                        .product(product)
-                        .name(e.select(".lef").text())
-                        .value(e.select(".rig").text())
-                        .build()
-                )
-                .toList();
+            .map(e -> Specification.builder()
+                .product(product)
+                .name(e.select(".lef").text())
+                .value(e.select(".rig").text())
+                .build()
+            )
+            .toList();
         product.setSpecifications(specs);
         Element description = detailsPage.select(".productDescription > ul > li").first();
         product.setDescription(description != null ? description.text() : null);

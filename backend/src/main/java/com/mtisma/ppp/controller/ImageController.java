@@ -23,6 +23,6 @@ public class ImageController {
     @GetMapping(value = "/download/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
     public FileSystemResource downloadById(@PathVariable("id") long id) {
         return imageService.downloadImage(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

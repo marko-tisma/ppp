@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,11 +53,11 @@ public class ProductService {
     }
 
     public List<Product> findByCategoryId(
-            long id,
-            Optional<Integer> page,
-            Optional<Integer> size,
-            Optional<String> sortBy,
-            Optional<String> nameQuery
+        long id,
+        Optional<Integer> page,
+        Optional<Integer> size,
+        Optional<String> sortBy,
+        Optional<String> nameQuery
     ) {
         PageRequest pageable = PageRequest.of(page.orElse(0), size.orElse(Integer.MAX_VALUE));
         if (sortBy.isPresent()) {
@@ -86,18 +89,18 @@ public class ProductService {
         }
 
         Map<Category, List<Product>> categories = products.stream()
-                .collect(Collectors.groupingBy(Product::getCategory));
+            .collect(Collectors.groupingBy(Product::getCategory));
 
         var now = LocalDate.now();
         categories.entrySet().parallelStream()
-                .forEach(c -> {
-                    Category category = categoryRepository.findOneByName(c.getKey().getName())
-                            .orElseGet(() -> categoryRepository.save(c.getKey()));
-                    for (Product product : c.getValue()) {
-                        product.setCategory(category);
-                        saveProduct(product, now);
-                    }
-        });
+            .forEach(c -> {
+                Category category = categoryRepository.findOneByName(c.getKey().getName())
+                    .orElseGet(() -> categoryRepository.save(c.getKey()));
+                for (Product product : c.getValue()) {
+                    product.setCategory(category);
+                    saveProduct(product, now);
+                }
+            });
         return true;
     }
 
@@ -105,10 +108,10 @@ public class ProductService {
     public void saveProduct(Product product, LocalDate now) {
         productRepository.save(product);
         priceHistoryRepository.save(PriceHistory.builder()
-                .product(product)
-                .amount(product.getCurrentPrice())
-                .createdAt(now)
-                .build()
+            .product(product)
+            .amount(product.getCurrentPrice())
+            .createdAt(now)
+            .build()
         );
         if (product.getSpecifications() != null) {
             product.getSpecifications().forEach(s -> {
@@ -130,16 +133,16 @@ public class ProductService {
             thumbnail.setLocation(location.get());
             imageRepository.save(thumbnail);
             log.info("Saved thumbnail: %s of product: %s at location: %s"
-                    .formatted(thumbnail.getName(), product.getName(), location));
+                .formatted(thumbnail.getName(), product.getName(), location));
         } else {
             log.error("Failed to save thumbnail: %s of product: %s at location: %s"
-                    .formatted(thumbnail.getName(), product.getName(), location));
+                .formatted(thumbnail.getName(), product.getName(), location));
         }
     }
 
     public List<PriceHistory> getProductHistory(Long productId, Optional<LocalDate> from, Optional<LocalDate> to) {
         return priceHistoryRepository.findByProductIdAndCreatedAtBetween(
-                productId, from.orElse(LocalDate.MIN), to.orElse(LocalDate.MAX)
+            productId, from.orElse(LocalDate.MIN), to.orElse(LocalDate.MAX)
         );
     }
 

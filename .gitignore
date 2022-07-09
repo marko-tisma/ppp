@@ -35,3 +35,4 @@ build/
 /file
 /images
 /backend/.images
+/backend/src/main/resources/secrets.env
