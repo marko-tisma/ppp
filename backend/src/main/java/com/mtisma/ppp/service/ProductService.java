@@ -142,7 +142,7 @@ public class ProductService {
 
     public List<PriceHistory> getProductHistory(Long productId, Optional<LocalDate> from, Optional<LocalDate> to) {
         return priceHistoryRepository.findByProductIdAndCreatedAtBetween(
-            productId, from.orElse(LocalDate.MIN), to.orElse(LocalDate.MAX)
+            productId, from.orElse(LocalDate.MIN), to.orElse(LocalDate.now())
         );
     }
 
