@@ -1,8 +1,10 @@
 import { MouseEvent, useCallback, useRef, useState } from 'react';
-import ProductDetails from '../components/ProductDetails';
 import ProductTable from '../components/ProductTable';
 import { Category, getCategories, getProducts, Product, refreshProducts } from '../services/ProductService';
 import styles from '../styles/Home.module.css';
+import dynamic from 'next/dynamic';
+
+const ProductDetails = dynamic(() => import('../components/ProductDetails'));
 
 export async function getStaticProps(context: any) {
   let categories = await getCategories();
