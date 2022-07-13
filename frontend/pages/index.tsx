@@ -1,7 +1,7 @@
 import { MouseEvent, useCallback, useRef, useState } from 'react';
 import ProductDetails from '../components/ProductDetails';
 import ProductTable from '../components/ProductTable';
-import { Category, getCategories, Product, refreshProducts } from '../services/ProductService';
+import { Category, getCategories, getProducts, Product, refreshProducts } from '../services/ProductService';
 import styles from '../styles/Home.module.css';
 
 export async function getStaticProps(context: any) {
@@ -12,14 +12,21 @@ export async function getStaticProps(context: any) {
       categories = await getCategories();
     }
   }
+
+  const categoryProducts = [];
+  for (const category of categories) {
+    const products = await getProducts(category, 0, 20);
+    categoryProducts.push([category, products]);
+  }
+
   return {
     props: {
-      categories
+      categories: categoryProducts
     }
   }
 }
 
-const Home = ({ categories }: { categories: Category[] }) => {
+const Home = ({ categories }: { categories: Map<Category, Product[]> }) => {
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -48,7 +55,7 @@ const Home = ({ categories }: { categories: Category[] }) => {
         </button>
       </aside>
       <main className={styles.main}>
-        {categories.map(c =>
+        {Array.from(categories).map(([c, p]) =>
           <div key={c.id}>
             <button onClick={(e) => onCategorySelect(e, c)} className={styles.btn}>
               {c.name}
@@ -57,7 +64,7 @@ const Home = ({ categories }: { categories: Category[] }) => {
               }
             </button>
             {selectedCategory == c &&
-              <ProductTable category={c} selectProduct={selectProduct} />
+              <ProductTable category={c} selectProduct={selectProduct} initialProducts={p} />
             }
           </div>
         )}

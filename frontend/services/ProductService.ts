@@ -33,8 +33,8 @@ export async function getProducts(
   category: Category,
   page: number,
   size: number,
-  sortBy: string | null,
-  query: string | null
+  sortBy?: string,
+  query?: string
 ): Promise<Product[]> {
   const urlParams = new URLSearchParams();
   urlParams.set("page", page.toString());

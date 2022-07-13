@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Category, getProducts, Product } from "../services/ProductService";
 import styles from "../styles/ProductTable.module.css";
 import ProductImage from "./ProductImage";
@@ -13,15 +13,18 @@ const debounce = (f: Function, timeout = 300) => {
 
 let pageSize = 20;
 
-const ProductTable = ({ category, selectProduct }: { category: Category, selectProduct: Function }) => {
+const ProductTable = ({ category, selectProduct, initialProducts = [] }:
+  { category: Category, selectProduct: Function, initialProducts: Product[] }) => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [nameQuery, setNameQuery] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [nameQuery, setNameQuery] = useState<string | undefined>(undefined);
 
   const tableRef = useRef<HTMLTableElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const firstUpdate = useRef(true);
 
   useEffect(() => {
     containerRef.current?.parentElement?.scrollIntoView({ behavior: 'smooth' });
@@ -33,11 +36,16 @@ const ProductTable = ({ category, selectProduct }: { category: Category, selectP
       const products = await getProducts(category, 0, pageSize, sortBy, nameQuery);
       setProducts(products);
     }
-    reloadProducts();
-    tableRef.current?.scroll(0, 0);
-  }, [sortBy, nameQuery])
+    if (firstUpdate.current && initialProducts.length > 0) {
+      setProducts(initialProducts);
+    } else {
+      reloadProducts();
+      tableRef.current?.scroll(0, 0);
+    }
+    firstUpdate.current = false;
+  }, [category, initialProducts, sortBy, nameQuery])
 
-  const onSort = useCallback(debounce((property: string) => {
+  const onSort = useMemo(() => debounce((property: string) => {
     if (sortBy === property || sortBy?.substring(1) === property) {
       setSortBy(sortBy.at(0) == '-' ? `+${property}` : `-${property}`);
     } else {
@@ -45,9 +53,9 @@ const ProductTable = ({ category, selectProduct }: { category: Category, selectP
     }
   }), [sortBy]);
 
-  const onSearch = useCallback(debounce(setNameQuery), []);
+  const onSearch = useMemo(() => debounce(setNameQuery), []);
 
-  const onScroll = useCallback(debounce(async () => {
+  const onScroll = useMemo(() => debounce(async () => {
     const table = tableRef.current;
     if (table && table.scrollHeight - table.scrollTop === table.clientHeight) {
       setPage(page + 1);
