@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Category, Product } from "../types/product";
-import { getProducts } from "./service/ProductService";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Category, getProducts, Product } from "../services/ProductService";
+import styles from "../styles/ProductTable.module.css";
 import ProductImage from "./ProductImage";
-
-import styles from "../../styles/ProductTable.module.css";
 
 const debounce = (f: Function, timeout = 300) => {
   let timer: NodeJS.Timeout;
@@ -13,7 +11,9 @@ const debounce = (f: Function, timeout = 300) => {
   }
 }
 
-const ProductTable: any = ({category, setActiveProduct} : {category: Category, setActiveProduct: Function}) => {
+let pageSize = 20;
+
+const ProductTable = ({ category, selectProduct }: { category: Category, selectProduct: Function }) => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState<number>(0);
@@ -21,8 +21,11 @@ const ProductTable: any = ({category, setActiveProduct} : {category: Category, s
   const [nameQuery, setNameQuery] = useState<string | null>(null);
 
   const tableRef = useRef<HTMLTableElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  let pageSize = 20;
+  useEffect(() => {
+    containerRef.current?.parentElement?.scrollIntoView({ behavior: 'smooth' });
+  });
 
   useEffect(() => {
     async function reloadProducts() {
@@ -31,32 +34,31 @@ const ProductTable: any = ({category, setActiveProduct} : {category: Category, s
       setProducts(products);
     }
     reloadProducts();
-    const table: HTMLTableElement | null = tableRef.current;
-    if (table) table.scroll(0, 0);
+    tableRef.current?.scroll(0, 0);
   }, [sortBy, nameQuery])
 
-  const onSort = debounce((property: string) => {
+  const onSort = useCallback(debounce((property: string) => {
     if (sortBy === property || sortBy?.substring(1) === property) {
       setSortBy(sortBy.at(0) == '-' ? `+${property}` : `-${property}`);
     } else {
       setSortBy(`+${property}`);
     }
-  });
+  }), [sortBy]);
 
-  const onSearch = debounce(setNameQuery);
+  const onSearch = useCallback(debounce(setNameQuery), []);
 
-  const onScroll = debounce(async () => {
-    const table: HTMLTableElement | null = tableRef.current;
+  const onScroll = useCallback(debounce(async () => {
+    const table = tableRef.current;
     if (table && table.scrollHeight - table.scrollTop === table.clientHeight) {
       setPage(page + 1);
       let newPage = await getProducts(category, page + 1, pageSize, sortBy, nameQuery);
-      newPage = newPage.filter(p => !products.find((value) => value.id == p.id));
+      newPage = newPage.filter(p => !products.find((value) => value.id === p.id));
       setProducts([...products, ...newPage]);
     }
-  });
+  }), [products, page, sortBy, nameQuery]);
 
   return (
-    <div className={styles.productsContainer}>
+    <div className={styles.container} ref={containerRef}>
       <input type="text" onChange={(e) => onSearch(e.target.value)} className={styles.searchInput} placeholder="Search..."></input>
       {products.length > 0 ? (
         <div ref={tableRef} className={styles.productTableContainer} onScroll={onScroll}>
@@ -65,29 +67,34 @@ const ProductTable: any = ({category, setActiveProduct} : {category: Category, s
               <tr>
                 <th className={styles.imageTh}></th>
                 <th onClick={() => onSort('name')} className={styles.nameTh}>
-                  Name{sortBy == '+name' ? <span>⬆️</span> : sortBy == '-name' ? <span>⬇️</span>: ""}
+                  Name{sortBy == '+name' ? <span>⬆️</span> : sortBy == '-name' ? <span>⬇️</span> : ""}
                 </th>
                 <th onClick={() => onSort('currentPrice')} className={styles.priceTh}>
-                  Price{sortBy == '+currentPrice' ? <span>⬆️</span> : sortBy == '-currentPrice' ? <span>⬇️</span>: ""}
+                  Price{sortBy == '+currentPrice' ? <span>⬆️</span> : sortBy == '-currentPrice' ? <span>⬇️</span> : ""}
                 </th>
               </tr>
             </thead>
             <tbody>
               {products && products.map(p =>
-                  <tr key={p.id} onClick={() => setActiveProduct(p)}>
+                <tr key={p.id} onClick={() => selectProduct(p)}>
                   <td>
-                    <ProductImage product={p} width={64} height={64}></ProductImage>
+                    <ProductImage product={p} width={64} height={64} />
                   </td>
-                  <td className={styles.nameTd}>{p.name}</td>
-                  <td className={styles.priceTd}>{Number(p.currentPrice).toLocaleString()} RSD</td>
+                  <td className={styles.nameTd}>
+                    {p.name}
+                  </td>
+                  <td className={styles.priceTd}>
+                    {Number(p.currentPrice).toLocaleString()} RSD
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div> 
+        </div>
       ) : <h2>No results</h2>}
     </div>
   );
+
 }
 
 export default ProductTable;

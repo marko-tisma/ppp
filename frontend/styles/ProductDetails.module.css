@@ -1,29 +1,57 @@
-.detailsContainer {
-  margin: 4.5rem 2rem;
+.container {
+  height: 90vh;
+  max-width: 20vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 20vw;
   position: sticky;
-  top: 3rem;
+  color: #a0a0a0;
+  border: 1px solid white;
+  padding: 1rem 1rem;
+  margin: 2rem 2rem;
+  overflow: auto;
+  background: #111827;
+}
+
+.productName {
+  font-size: medium;
+  text-align: center;
+  font-weight: 600;
+  padding: 1rem 1rem;
 }
 
 .detailsTable {
-  table-layout: fixed;
+  text-align: center;
   width: 100%;
-  border-collapse: collapse; 
+  border-collapse: collapse;
 }
 
-.detailsTableTd {
-  border: 2px solid gray;
+.detailsTable td {
+  border: 1px solid gray;
 }
 
 .historyContainer {
-  width: 100%; 
-  height: 300px; 
+  padding: 1rem 0rem;
+  width: 100%;
+  flex: 0 1 300px;
 }
 
-.xImage {
-  align-self: flex-end;
+.close {
+  margin: 0.5rem 0rem;
+  align-self: flex-start;
+  transform: scale(1.5);
+  cursor: pointer;
+}
+
+@media (max-width: 1000px) {
+  .container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    max-width: 100vw;
+  }
+
 }

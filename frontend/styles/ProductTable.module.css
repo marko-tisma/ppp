@@ -1,72 +1,99 @@
-.productsContainer {
+.container {
   max-height: 80vh;
-  width: 100%;
-  display: flex; 
+  display: flex;
   flex-direction: column;
   align-items: center;
+  color: #a0a0a0;
 }
 
 .productTableContainer {
-  overflow-y: auto;
-  height: 100%;
-  width: 100%;
+  width: 80%;
+  overflow: auto;
+  border: 1px solid white;
 }
 
 .searchInput {
-  width: calc(100% - 0.5rem);
-  margin: 0.5rem;
+  margin: 1rem 1rem;
   font-size: x-large;
-  border: 2px solid;
-  min-height: 40px;
+  padding: 0.5rem 0.5rem;
+  border-radius: 10px;
+  background-color: white;
+  color: black;
+  border: 0;
 }
 
 .productTable {
   width: 100%;
   text-align: left;
-  border-collapse: separate;
   border-spacing: 0px;
+  background: #111827;
 }
 
 .productTable th {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: white;
+  background: #111827;
   font-size: x-large;
-  padding: 20px 20px;
-  border-bottom: 2px solid black;
-}
-
-.productTable tr:hover {
-  background: lightcyan;
+  padding: 1.5rem 0.5rem;
+  border-bottom: 1px solid white;
 }
 
 .imageTh {
-  min-width: 70px;
+  width: 10%;
 }
 
-.nameTh:hover, .priceTh:hover, .priceTd:hover {
-  color:#0070f3;
+.priceTh {
+  width: 10%;
+}
+
+.nameTh:hover,
+.priceTh:hover {
+  color: white;
+}
+
+.productTable tbody tr:hover {
+  color: white;
 }
 
 .productTable td {
-  border-bottom: 1px solid black;
-  z-index: -1;
-}
-
-.nameTd, .priceTd {
-  font-weight: 600;
+  padding: 0.1rem 0.5rem;
   font-size: medium;
-  padding: 10px 10px;
+  font-weight: 600;
+  border-bottom: 1px solid gray;
 }
 
-@media only screen and (max-width: 1600px) {
+.priceTd {
+  text-align: left;
+}
 
-  .nameTd, .priceTd {
+@media (max-width: 1000px) {
+
+  .productTable th {
+    font-size: large;
+  }
+
+  .productTable td {
     font-size: small;
   }
 
-  .imageTh {
-    min-width: 40px;
+  .searchInput {
+    font-size: large;
   }
+}
+
+@media (max-width: 600px) {
+
+  .productTable th {
+    font-size: medium;
+  }
+
+  .productTable td {
+    font-size: x-small;
+  }
+
+  .searchInput {
+    font-size: medium;
+  }
+
 }

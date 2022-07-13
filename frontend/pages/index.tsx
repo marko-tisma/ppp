@@ -1,11 +1,8 @@
-import Head from 'next/head';
-import { useState } from 'react';
-import ProductDetails from '../src/components/ProductDetails';
-import ProductTable from '../src/components/ProductTable';
+import { MouseEvent, useCallback, useRef, useState } from 'react';
+import ProductDetails from '../components/ProductDetails';
+import ProductTable from '../components/ProductTable';
+import { Category, getCategories, Product, refreshProducts } from '../services/ProductService';
 import styles from '../styles/Home.module.css';
-import { Category, Product } from '../src/types/product';
-import { getCategories, refreshProducts } from '../src/components/service/ProductService';
-
 
 export async function getStaticProps(context: any) {
   let categories = await getCategories();
@@ -22,37 +19,51 @@ export async function getStaticProps(context: any) {
   }
 }
 
-const Home: any = ({categories}: {categories: Category[]}) => {
+const Home = ({ categories }: { categories: Category[] }) => {
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const selectCategory = (category: Category) => {
-    setSelectedCategory(selectedCategory == category ? null : category);
-  }
+  const selectedCategoryButton = useRef<Element>();
 
-  const selectProduct = (product: Product) => {
+  const onCategorySelect = useCallback((event: MouseEvent, category: Category) => {
+    if (event.target instanceof Element) {
+      selectedCategoryButton.current = event.target;
+    }
+    setSelectedCategory(selectedCategory == category ? null : category);
+  }, [selectedCategory]);
+
+  const selectProduct = useCallback((product: Product) => {
     setSelectedProduct(selectedProduct == product ? null : product);
-  }
+  }, [selectedProduct]);
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>PPP</title>
-      </Head>
+      <aside className={styles.sidebar}>
+        <button className={styles.sidebarBtn}>
+          <span>👤</span>Login
+        </button>
+        <button className={styles.sidebarBtn}>
+          <span>🛑</span>Logout
+        </button>
+      </aside>
       <main className={styles.main}>
-          {categories.map(c => 
-            <div key={c.id}>
-              <button onClick={() => selectCategory(c)} className={styles.btn}>
-                {c.name}
-              </button>
-              {selectedCategory == c && <ProductTable category={c} setActiveProduct={selectProduct}></ProductTable>}
-            </div>
-          )}
+        {categories.map(c =>
+          <div key={c.id}>
+            <button onClick={(e) => onCategorySelect(e, c)} className={styles.btn}>
+              {c.name}
+              {selectedCategory == c ?
+                <span>🔼</span> : <span>🔽</span>
+              }
+            </button>
+            {selectedCategory == c &&
+              <ProductTable category={c} selectProduct={selectProduct} />
+            }
+          </div>
+        )}
       </main>
-      {selectedProduct && <aside>
-          <ProductDetails product={selectedProduct} setActiveProduct={selectProduct}></ProductDetails>
-        </aside>
+      {selectedProduct &&
+        <ProductDetails product={selectedProduct} selectProduct={selectProduct} />
       }
     </div>
   )
