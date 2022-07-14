@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Category, getProducts, Product } from "../services/ProductService";
 import styles from "../styles/ProductTable.module.css";
 import ProductImage from "./ProductImage";

@@ -1,8 +1,10 @@
-import { MouseEvent, useCallback, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { Fragment, MouseEvent, useCallback, useEffect, useState } from 'react';
 import ProductTable from '../components/ProductTable';
+import { getUser, logout, User } from '../services/UserService';
 import { Category, getCategories, getProducts, Product, refreshProducts } from '../services/ProductService';
 import styles from '../styles/Home.module.css';
-import dynamic from 'next/dynamic';
 
 const ProductDetails = dynamic(() => import('../components/ProductDetails'));
 
@@ -30,15 +32,17 @@ export async function getStaticProps(context: any) {
 
 const Home = ({ categories }: { categories: Map<Category, Product[]> }) => {
 
+  const router = useRouter();
+
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const selectedCategoryButton = useRef<Element>();
+  useEffect(() => {
+    setUser(getUser());
+  }, [])
 
   const onCategorySelect = useCallback((event: MouseEvent, category: Category) => {
-    if (event.target instanceof Element) {
-      selectedCategoryButton.current = event.target;
-    }
     setSelectedCategory(selectedCategory == category ? null : category);
   }, [selectedCategory]);
 
@@ -46,15 +50,27 @@ const Home = ({ categories }: { categories: Map<Category, Product[]> }) => {
     setSelectedProduct(selectedProduct == product ? null : product);
   }, [selectedProduct]);
 
+  const onLogout = useCallback(() => {
+    logout();
+    setUser(null);
+  }, []);
+
   return (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
-        <button className={styles.sidebarBtn}>
-          <span>👤</span>Login
-        </button>
-        <button className={styles.sidebarBtn}>
-          <span>🛑</span>Logout
-        </button>
+        {!user &&
+          <button className={styles.sidebarBtn} onClick={() => router.push('/login')}>
+            <span>👤</span>Login
+          </button>
+        }
+        {user &&
+          <Fragment>
+            <div className={styles.username}>Username: {user.username}</div>
+            <button className={styles.sidebarBtn} onClick={onLogout}>
+              <span>🛑</span>Logout
+            </button>
+          </Fragment>
+        }
       </aside>
       <main className={styles.main}>
         {Array.from(categories).map(([c, p]) =>

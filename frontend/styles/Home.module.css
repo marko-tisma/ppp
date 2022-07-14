@@ -12,6 +12,13 @@
   border-right: 2px solid white;
 }
 
+.username {
+  font-size: x-large;
+  padding: 1rem 1rem;
+  color: #a0a0a0;
+  align-self: center;
+}
+
 .main {
   height: 100vh;
   overflow-y: auto;

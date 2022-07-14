@@ -1,0 +1,78 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #111827;
+  color: white;
+}
+
+.home {
+  transform: scale(2);
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: large;
+}
+
+.input {
+  font-size: x-large;
+  padding: 0.5rem 0.5rem;
+  width: 100%;
+  border-radius: 5px;
+  border: 2px solid black;
+}
+
+.inputError {
+  border: 2px solid #b91c1c;
+  color: #b91c1c;
+}
+
+.loginBtn {
+  font-size: large;
+  padding: 0.5rem 0.5rem;
+  border: 0;
+  border-radius: 5px;
+  background: #1d4ed8;
+  color: white;
+  margin-top: 2rem;
+}
+
+.loginBtn:hover {
+  background: #1e40af
+}
+
+.registerBtn {
+  font-size: large;
+  padding: 0.5rem 0.5rem;
+  border: 0;
+  border-radius: 5px;
+  background: #27272a;
+  color: white;
+  margin-top: 1rem;
+}
+
+.registerBtn:hover {
+  background: #18181b;
+}
+
+.errorMessage {
+  margin: 1rem 1rem;
+  color: #b91c1c;
+  text-align: center;
+  font-size: large;
+}
+
+.registeredMessage {
+  margin: 1rem 1rem;
+  color: #16a34a;
+  text-align: center;
+  font-size: large;
+}
