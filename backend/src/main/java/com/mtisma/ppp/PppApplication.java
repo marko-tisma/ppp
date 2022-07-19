@@ -2,6 +2,7 @@ package com.mtisma.ppp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableGlobalMethodSecurity(
     jsr250Enabled = true
 )
+@PropertySource(value = "classpath:/secrets.env", ignoreResourceNotFound = true)
 public class PppApplication {
 
     public static void main(String[] args) {

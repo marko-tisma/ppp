@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class LoginService {
+public class AuthService {
 
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public LoginService(AuthenticationManager authenticationManager) {
+    public AuthService(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
         this.authenticationManager = authenticationManager;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     public Optional<User> login(LoginRequest loginRequest) {
@@ -26,9 +28,18 @@ public class LoginService {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
             User user = (User) authenticate.getPrincipal();
-            user.setJwtToken(JwtTokenUtil.generateToken(user));
+            user.setJwtToken(jwtTokenUtil.generateToken(user));
             return Optional.of(user);
         } catch (BadCredentialsException ex) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<String> refreshToken(Authentication authentication) {
+        try {
+            User user = (User) authentication.getPrincipal();
+            return Optional.of(jwtTokenUtil.generateToken(user));
+        } catch (Exception e) {
             return Optional.empty();
         }
     }

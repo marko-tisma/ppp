@@ -18,9 +18,11 @@ import java.io.IOException;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public JwtTokenFilter(UserRepository userRepository) {
+    public JwtTokenFilter(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @Override
@@ -32,9 +34,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         String token = header.split(" ")[1].trim();
-        String username = JwtTokenUtil.extractUsername(token);
+        String username;
+        try {
+            username = jwtTokenUtil.extractUsername(token);
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         UserDetails userDetails = userRepository.findByUsername(username).orElse(null);
-        if (userDetails == null || !JwtTokenUtil.validateToken(token, userDetails)) {
+        if (userDetails == null || !jwtTokenUtil.validateToken(token, userDetails)) {
             filterChain.doFilter(request, response);
             return;
         }
