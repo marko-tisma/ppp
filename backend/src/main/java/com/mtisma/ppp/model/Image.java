@@ -2,19 +2,21 @@ package com.mtisma.ppp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Image {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -22,10 +24,11 @@ public class Image {
     private Product product;
 
     @Column(unique = true)
-    @NotNull
+    @NotBlank
     private String name;
 
     @JsonIgnore
+    @NotBlank
     private String location;
 
     @Transient

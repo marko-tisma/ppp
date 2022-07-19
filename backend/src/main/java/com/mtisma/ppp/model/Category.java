@@ -1,34 +1,23 @@
 package com.mtisma.ppp.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
 @Setter
+@RequiredArgsConstructor
 @NoArgsConstructor
 public class Category {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(unique = true)
-    @NotNull
+    @NotBlank
+    @NonNull
     private String name;
-
-    @OneToMany(mappedBy = "category")
-    @JsonIgnore
-    private List<Product> products = new ArrayList<>();
-
-    public Category(String name) {
-        this.name = name;
-    }
 }
